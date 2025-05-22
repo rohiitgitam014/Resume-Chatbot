@@ -4,7 +4,7 @@ import google.generativeai as genai
 
 # ---- CONFIG ----
 st.set_page_config(page_title="Resume Chatbot", layout="wide")
-st.title("🤖Welcome to  Data Scientists Rohit kumar Chatbot ")
+st.title("🤖Welcome To  Data Scientists Rohit kumar Chatbot ")
 
 # ---- GEMINI API KEY INPUT ----
 api_key = "AIzaSyCPQ_eQIm-Csx6yYhchWDzbxqZQ1N5-zd0"
