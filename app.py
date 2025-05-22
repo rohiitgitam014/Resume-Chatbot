@@ -17,7 +17,7 @@ def extract_resume_text(pdf_path):
     doc = fitz.open(pdf_path)
     return "\n".join([page.get_text() for page in doc])
 
-resume_text = extract_resume_text("Rohit_Kumar.pdf")
+resume_text = extract_resume_text("Rohit Kumar.pdf")
 
 # ---- SESSION STATE INITIALIZATION ----
 if "chat" not in st.session_state:
