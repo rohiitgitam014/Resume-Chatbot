@@ -1,5 +1,5 @@
 import streamlit as st
-import fitz
+import PyMuPDF
 import google.generativeai as genai
 
 # ---- CONFIG ----
@@ -15,7 +15,7 @@ genai.configure(api_key=api_key)
 # ---- RESUME LOADING ----
 @st.cache_data
 def extract_resume_text(pdf_path):
-    doc =   fitz.open(pdf_path)
+    doc =   PyMuPDF.open(pdf_path)
     return "\n".join([page.get_text() for page in doc])
 
 resume_text = extract_resume_text("Rohit Kumar.pdf")
