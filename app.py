@@ -8,7 +8,7 @@ st.title("🤖Welcome To  Data Scientist Rohit kumar Chatbot ")
 st.image("rohit.jpg",width= 300) 
 
 # ---- GEMINI API KEY INPUT ----
-api_key = "AIzaSyAzEF9EjXplaQ4E-cy-ul_33bo4ri7-OIU"
+api_key = "AIzaSyBxRD4DTVI03_PO3ONPZyV1oUFfTBFQ0gM"
 
 genai.configure(api_key=api_key)
 
@@ -48,6 +48,7 @@ if user_input:
 
     # Store assistant message
     st.session_state.messages.append({"role": "assistant", "content": response.text})
+
 
 
 
