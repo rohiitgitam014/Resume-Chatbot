@@ -18,7 +18,7 @@ def extract_resume_text(pdf_path):
     doc =   fitz.open(pdf_path)
     return "\n".join([page.get_text() for page in doc])
 
-resume_text = extract_resume_text("Rohit Kumar.pdf")
+resume_text = extract_resume_text("Rohit Kumar Resume.pdf")
 
 # ---- SESSION STATE INITIALIZATION ----
 if "chat" not in st.session_state:
@@ -48,6 +48,7 @@ if user_input:
 
     # Store assistant message
     st.session_state.messages.append({"role": "assistant", "content": response.text})
+
 
 
 
