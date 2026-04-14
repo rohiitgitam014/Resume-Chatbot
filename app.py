@@ -10,7 +10,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY (USE ENV VARIABLE) ----
-genai.configure(api_key= AIzaSyBNdHBogx7kMKGEcW2gZR_Pf-oCM4k9Iq8)
+genai.configure(api_key= "AIzaSyBNdHBogx7kMKGEcW2gZR_Pf-oCM4k9Iq8")
 
 # ---- LOAD RESUME ----
 @st.cache_data
