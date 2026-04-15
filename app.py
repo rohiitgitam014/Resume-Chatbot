@@ -41,7 +41,7 @@ chunks = chunk_text(cleaned_resume)
 
 # ---- SESSION INIT ----
 if "chat" not in st.session_state:
-    model = genai.GenerativeModel("gemini-3-flash-preview")  # stable model
+    model = genai.GenerativeModel("gemini-2.5-flash-lite")  # stable model
     st.session_state.chat = model.start_chat(history=[])
     st.session_state.messages = []
 
