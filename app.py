@@ -8,7 +8,7 @@ st.title("🤖Welcome To  Data Scientist Rohit kumar Chatbot ")
 st.image("rohit.jpg",width= 300) 
 
 # ---- GEMINI API KEY INPUT ----
-api_key = "AIzaSyBVK_C-weZ9trdBJ3XtbUh254nPPE7yFCI"
+api_key = "AIzaSyDfP17Pe3aNyl4FrDwwHHDcNBWV7p106Bo"
 
 genai.configure(api_key=api_key)
 
