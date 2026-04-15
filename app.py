@@ -9,7 +9,12 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key = "AIzaSyBEj-szBKZ3_otXAr2i5EzqnmTznZMCRio"  # ⚠️ Replace or use st.secrets
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # load .env file
+
+api_key = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=api_key)
 
 # ---- LOAD RESUME ----
