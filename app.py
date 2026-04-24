@@ -9,7 +9,15 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- GROQ CLIENT ----
-client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+import os
+
+api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    st.error("❌ GROQ API key not found. Add it in Streamlit Secrets.")
+    st.stop()
+
+client = Groq(api_key=api_key)
 
 # ---- LOAD RESUME ----
 @st.cache_data
