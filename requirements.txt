@@ -1,5 +1,5 @@
 streamlit
 groq
-pymupdf==1.23.26
+pypdf
 python-dotenv
-python-3.11
+
