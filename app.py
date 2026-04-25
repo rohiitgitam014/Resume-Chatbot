@@ -1,6 +1,9 @@
 import streamlit as st
 from groq import Groq
 from pypdf import PdfReader
+from sentence_transformers import SentenceTransformer
+import faiss
+import numpy as np
 import re
 
 # ---- CONFIG ----
@@ -9,7 +12,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key = "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"  # Replace with your actual Groq API key
+api_key = "gsk_xxxxxxxxxxxxxxxxxxxxxxxxxx"  # Replace with your actual Groq API key
 client = Groq(api_key=api_key)
 
 # ---- LOAD PDF ----
@@ -21,41 +24,54 @@ def extract_resume_text(pdf_path):
         text += page.extract_text() or ""
     return text
 
-resume_text = extract_resume_text("Rohit Kumar Resume.pdf")
-
 # ---- CLEAN TEXT ----
 def clean_text(text):
     text = re.sub(r'[^\x00-\x7F]+', ' ', text)
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-cleaned_resume = clean_text(resume_text)
-
 # ---- CHUNKING ----
-def chunk_text(text, chunk_size=500):
+def chunk_text(text, chunk_size=400):
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
-chunks = chunk_text(cleaned_resume)
+# ---- BUILD FAISS INDEX ----
+@st.cache_resource
+def build_faiss_index(chunks):
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    embeddings = model.encode(chunks, convert_to_numpy=True)
+    dimension = embeddings.shape[1]
+    index = faiss.IndexFlatL2(dimension)
+    index.add(embeddings)
+    return index, model
 
-# ---- GET TOP RELEVANT CHUNKS ----
-def get_relevant_context(user_input, chunks, top_n=4):
-    scores = []
-    for chunk in chunks:
-        score = sum(word.lower() in chunk.lower() for word in user_input.split())
-        scores.append(score)
-    # Sort chunks by score and take top N
-    ranked = sorted(zip(scores, chunks), reverse=True)
-    top_chunks = [chunk for score, chunk in ranked[:top_n] if score > 0]
-    # Fall back to full resume if no matches
-    if not top_chunks:
-        return cleaned_resume[:3000]
-    return " ".join(top_chunks)[:3000]
+# ---- LOAD & PREPARE ----
+resume_text = extract_resume_text("Rohit Kumar Resume.pdf")
+cleaned_resume = clean_text(resume_text)
+chunks = chunk_text(cleaned_resume)
+faiss_index, embed_model = build_faiss_index(chunks)
+
+# ---- SEMANTIC SEARCH ----
+def get_relevant_context(user_input, top_k=5):
+    query_embedding = embed_model.encode([user_input], convert_to_numpy=True)
+    distances, indices = faiss_index.search(query_embedding, top_k)
+    top_chunks = [chunks[i] for i in indices[0] if i < len(chunks)]
+    return " ".join(top_chunks)[:4000]
 
 # ---- PROMPT ----
 def build_prompt(user_input, context):
-    return f"""You are a professional resume assistant for Rohit Kumar.
-Answer ONLY based on the resume content below.
-Be specific and helpful. If the answer is truly not in the resume, say: 'Not mentioned in resume'.
+    return f"""You are a friendly and professional assistant representing Rohit Kumar's resume.
+
+Answer questions about Rohit Kumar based ONLY on the resume content provided below.
+
+Guidelines:
+- Give clear, well-structured, and friendly answers
+- Use bullet points or formatting where it improves readability
+- If asked about education, mention degree, institution, year, and grades if available
+- If asked about experience, mention company, role, duration, and key responsibilities
+- If asked about skills, list them neatly by category if possible
+- If the information is truly not in the resume, say: "This detail isn't mentioned in Rohit's resume."
+- Never make up or assume information not present in the resume
+- Always refer to the person as "Rohit" in your answers
 
 Resume Content:
 {context}
@@ -83,11 +99,12 @@ if user_input:
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
-                context = get_relevant_context(user_input, chunks)
+                context = get_relevant_context(user_input)
                 prompt = build_prompt(user_input, context)
                 completion = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
-                    max_tokens=512,
+                    max_tokens=700,
+                    temperature=0.3,
                     messages=[{"role": "user", "content": prompt}]
                 )
                 answer = completion.choices[0].message.content
