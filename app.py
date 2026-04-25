@@ -13,7 +13,7 @@ client = Groq(api_key=api_key)
 
 # ---- PDF READER ----
 # ---- LOAD RESUME FROM LOCAL PDF ----
-PDF_PATH = ""  # put your PDF in the same folder as the script
+PDF_PATH = "Rohit Kumar Resume.pdf"  # put your PDF in the same folder as the script
 
 @st.cache_data
 def load_resume() -> str:
@@ -25,7 +25,7 @@ def load_resume() -> str:
             text += extracted + "\n"
     return text.strip()
 
-resume_text = load_resume()
+resume = load_resume()
 # ---- SYSTEM PROMPT ----
 def build_system_prompt(resume: str) -> str:
     return f"""You are a professional and friendly assistant for a resume chatbot.
