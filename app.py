@@ -32,28 +32,32 @@ def clean_text(text):
 cleaned_resume = clean_text(resume_text)
 
 # ---- CHUNKING ----
-def chunk_text(text, chunk_size=1500):
+def chunk_text(text, chunk_size=500):
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
 chunks = chunk_text(cleaned_resume)
 
-# ---- RELEVANT CHUNK ----
-def get_relevant_chunk(user_input, chunks):
+# ---- GET TOP RELEVANT CHUNKS ----
+def get_relevant_context(user_input, chunks, top_n=4):
     scores = []
     for chunk in chunks:
         score = sum(word.lower() in chunk.lower() for word in user_input.split())
         scores.append(score)
-    best_chunk = chunks[scores.index(max(scores))]
-    # Limit context to 2000 characters to stay within token limits
-    return best_chunk[:2000]
+    # Sort chunks by score and take top N
+    ranked = sorted(zip(scores, chunks), reverse=True)
+    top_chunks = [chunk for score, chunk in ranked[:top_n] if score > 0]
+    # Fall back to full resume if no matches
+    if not top_chunks:
+        return cleaned_resume[:3000]
+    return " ".join(top_chunks)[:3000]
 
 # ---- PROMPT ----
 def build_prompt(user_input, context):
-    return f"""You are a professional resume assistant.
-Answer ONLY based on the resume below.
-If the answer is not available, say: 'Not mentioned in resume'.
+    return f"""You are a professional resume assistant for Rohit Kumar.
+Answer ONLY based on the resume content below.
+Be specific and helpful. If the answer is truly not in the resume, say: 'Not mentioned in resume'.
 
-Resume:
+Resume Content:
 {context}
 
 Question: {user_input}
@@ -79,8 +83,8 @@ if user_input:
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
-                relevant_chunk = get_relevant_chunk(user_input, chunks)
-                prompt = build_prompt(user_input, relevant_chunk)
+                context = get_relevant_context(user_input, chunks)
+                prompt = build_prompt(user_input, context)
                 completion = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     max_tokens=512,
