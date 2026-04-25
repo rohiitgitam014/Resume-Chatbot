@@ -1,7 +1,7 @@
 import streamlit as st
 from groq import Groq
 from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 import faiss
 import numpy as np
 import re
@@ -12,7 +12,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key = "gsk_xxxxxxxxxxxxxxxxxxxxxxxxxx"  # Replace with your actual Groq API key
+api_key = "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"  # Replace with your actual Groq API key
 client = Groq(api_key=api_key)
 
 # ---- LOAD PDF ----
@@ -36,9 +36,9 @@ def chunk_text(text, chunk_size=400):
 
 # ---- BUILD FAISS INDEX ----
 @st.cache_resource
-def build_faiss_index(chunks):
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-    embeddings = model.encode(chunks, convert_to_numpy=True)
+def build_faiss_index(_chunks):
+    model = TextEmbedding("BAAI/bge-small-en-v1.5")
+    embeddings = np.array(list(model.embed(_chunks)), dtype="float32")
     dimension = embeddings.shape[1]
     index = faiss.IndexFlatL2(dimension)
     index.add(embeddings)
@@ -52,7 +52,7 @@ faiss_index, embed_model = build_faiss_index(chunks)
 
 # ---- SEMANTIC SEARCH ----
 def get_relevant_context(user_input, top_k=5):
-    query_embedding = embed_model.encode([user_input], convert_to_numpy=True)
+    query_embedding = np.array(list(embed_model.embed([user_input])), dtype="float32")
     distances, indices = faiss_index.search(query_embedding, top_k)
     top_chunks = [chunks[i] for i in indices[0] if i < len(chunks)]
     return " ".join(top_chunks)[:4000]
