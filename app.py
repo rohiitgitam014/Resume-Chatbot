@@ -82,7 +82,7 @@ if user_input:
                 relevant_chunk = get_relevant_chunk(user_input, chunks)
                 prompt = build_prompt(user_input, relevant_chunk)
                 completion = client.chat.completions.create(
-                    model="llama3-8b-8192",
+                    model="llama-3.3-70b-versatile",
                     max_tokens=512,
                     messages=[{"role": "user", "content": prompt}]
                 )
