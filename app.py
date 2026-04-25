@@ -32,7 +32,7 @@ def clean_text(text):
 cleaned_resume = clean_text(resume_text)
 
 # ---- CHUNKING ----
-def chunk_text(text, chunk_size=1000):
+def chunk_text(text, chunk_size=1500):
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
 chunks = chunk_text(cleaned_resume)
@@ -43,21 +43,21 @@ def get_relevant_chunk(user_input, chunks):
     for chunk in chunks:
         score = sum(word.lower() in chunk.lower() for word in user_input.split())
         scores.append(score)
-    return chunks[scores.index(max(scores))]
+    best_chunk = chunks[scores.index(max(scores))]
+    # Limit context to 2000 characters to stay within token limits
+    return best_chunk[:2000]
 
 # ---- PROMPT ----
 def build_prompt(user_input, context):
-    return f"""
-You are a professional resume assistant.
+    return f"""You are a professional resume assistant.
 Answer ONLY based on the resume below.
-If answer is not available, say: 'Not mentioned in resume'.
+If the answer is not available, say: 'Not mentioned in resume'.
 
 Resume:
 {context}
 
-Question:
-{user_input}
-"""
+Question: {user_input}
+Answer:"""
 
 # ---- SESSION ----
 if "messages" not in st.session_state:
@@ -78,13 +78,17 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            relevant_chunk = get_relevant_chunk(user_input, chunks)
-            prompt = build_prompt(user_input, relevant_chunk)
-            completion = client.chat.completions.create(
-                model="llama3-8b-8192",
-                messages=[{"role": "user", "content": prompt}]
-            )
-            answer = completion.choices[0].message.content
+            try:
+                relevant_chunk = get_relevant_chunk(user_input, chunks)
+                prompt = build_prompt(user_input, relevant_chunk)
+                completion = client.chat.completions.create(
+                    model="llama3-8b-8192",
+                    max_tokens=512,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                answer = completion.choices[0].message.content
+            except Exception as e:
+                answer = f"⚠️ Error: {str(e)}"
             st.markdown(answer)
 
     st.session_state.messages.append({
