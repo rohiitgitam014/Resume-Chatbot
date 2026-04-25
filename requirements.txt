@@ -2,4 +2,5 @@ streamlit
 groq
 pypdf
 python-dotenv
-
+faiss-cpu
+sentence-transformers
