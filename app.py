@@ -12,8 +12,12 @@ api_key = "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"
 client = Groq(api_key=api_key)
 
 # ---- PDF READER ----
-def extract_text_from_pdf(pdf_file) -> str:
-    reader = PdfReader(pdf_file)
+# ---- LOAD RESUME FROM LOCAL PDF ----
+PDF_PATH = ""  # put your PDF in the same folder as the script
+
+@st.cache_data
+def load_resume() -> str:
+    reader = PdfReader(PDF_PATH)
     text = ""
     for page in reader.pages:
         extracted = page.extract_text()
@@ -21,16 +25,7 @@ def extract_text_from_pdf(pdf_file) -> str:
             text += extracted + "\n"
     return text.strip()
 
-# ---- PDF UPLOAD ----
-uploaded_pdf = st.sidebar.file_uploader("📄 Upload Resume PDF", type=["pdf"])
-
-resume_text = ""
-if uploaded_pdf:
-    resume_text = extract_text_from_pdf(uploaded_pdf)
-    st.sidebar.success("✅ Resume loaded successfully!")
-else:
-    st.sidebar.warning("⚠️ Please upload a resume PDF to begin.")
-
+resume_text = load_resume()
 # ---- SYSTEM PROMPT ----
 def build_system_prompt(resume: str) -> str:
     return f"""You are a professional and friendly assistant for a resume chatbot.
