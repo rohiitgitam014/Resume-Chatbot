@@ -1,8 +1,8 @@
 import streamlit as st
 from groq import Groq
+from pypdf import PdfReader
 import re
 import os
-import fitz  # PyMuPDF
 
 # ---- CONFIG ----
 st.set_page_config(page_title="Resume Chatbot", layout="wide")
@@ -20,10 +20,10 @@ client = Groq(api_key=api_key)
 # ---- LOAD PDF ----
 @st.cache_data
 def extract_resume_text(pdf_path):
-    doc = fitz.open(pdf_path)
+    reader = PdfReader(pdf_path)
     text = ""
-    for page in doc:
-        text += page.get_text()
+    for page in reader.pages:
+        text += page.extract_text() or ""
     return text
 
 resume_text = extract_resume_text("Rohit Kumar Resume.pdf")
