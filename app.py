@@ -11,7 +11,6 @@ st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
 api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
-
 if not api_key:
     st.error("❌ GROQ API key not found.")
     st.stop()
@@ -55,7 +54,6 @@ def get_relevant_chunk(user_input, chunks):
 def build_prompt(user_input, context):
     return f"""
 You are a professional resume assistant.
-
 Answer ONLY based on the resume below.
 If answer is not available, say: 'Not mentioned in resume'.
 
@@ -70,7 +68,7 @@ Question:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# ---- DISPLAY ----
+# ---- DISPLAY CHAT HISTORY ----
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
@@ -80,7 +78,6 @@ user_input = st.chat_input("Ask something about Rohit's resume...")
 
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
-
     with st.chat_message("user"):
         st.markdown(user_input)
 
@@ -88,12 +85,10 @@ if user_input:
         with st.spinner("Thinking..."):
             relevant_chunk = get_relevant_chunk(user_input, chunks)
             prompt = build_prompt(user_input, relevant_chunk)
-
             completion = client.chat.completions.create(
                 model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}]
             )
-
             answer = completion.choices[0].message.content
             st.markdown(answer)
 
