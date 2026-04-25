@@ -11,9 +11,8 @@ st.image("rohit.jpg", width=300)
 api_key = "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"
 client = Groq(api_key=api_key)
 
-# ---- PDF READER ----
 # ---- LOAD RESUME FROM LOCAL PDF ----
-PDF_PATH = "Rohit Kumar Resume.pdf"  # put your PDF in the same folder as the script
+PDF_PATH = "Rohit Kumar Resume.pdf"
 
 @st.cache_data
 def load_resume() -> str:
@@ -25,11 +24,11 @@ def load_resume() -> str:
             text += extracted + "\n"
     return text.strip()
 
-resume = load_resume()
+resume = load_resume()  # ✅ variable is called `resume`, not `resume_text`
+
 # ---- SYSTEM PROMPT ----
 def build_system_prompt(resume: str) -> str:
     return f"""You are a professional and friendly assistant for a resume chatbot.
-
 Answer questions ONLY based on the resume provided below.
 Be complete, accurate, and well-structured. Never skip any detail.
 
@@ -57,31 +56,28 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Ask something about the resume...")
 
 if user_input:
-    if not resume_text:
-        st.warning("Please upload a resume PDF first!")
-    else:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        with st.chat_message("user"):
-            st.markdown(user_input)
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.markdown(user_input)
 
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                try:
-                    completion = client.chat.completions.create(
-                        model="llama-3.3-70b-versatile",
-                        max_tokens=800,
-                        temperature=0.1,
-                        messages=[
-                            {"role": "system", "content": build_system_prompt(resume_text)},
-                            {"role": "user", "content": user_input}
-                        ]
-                    )
-                    answer = completion.choices[0].message.content
-                except Exception as e:
-                    answer = f"⚠️ Error: {str(e)}"
-                st.markdown(answer)
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            try:
+                completion = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    max_tokens=800,
+                    temperature=0.1,
+                    messages=[
+                        {"role": "system", "content": build_system_prompt(resume)},  # ✅ `resume`
+                        {"role": "user", "content": user_input}
+                    ]
+                )
+                answer = completion.choices[0].message.content
+            except Exception as e:
+                answer = f"⚠️ Error: {str(e)}"
+            st.markdown(answer)
 
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": answer
-        })
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": answer
+    })
