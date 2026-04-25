@@ -9,7 +9,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key = "gsk_xxxxxxxxxxxxxxxxxxxxxxxxxx"  # Replace with your actual Groq API key
+api_key = "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"  # Replace with your actual Groq API key
 client = Groq(api_key=api_key)
 
 # ---- FULL RESUME (hardcoded for 100% accuracy) ----
