@@ -2,7 +2,6 @@ import streamlit as st
 from groq import Groq
 from pypdf import PdfReader
 import re
-import os
 
 # ---- CONFIG ----
 st.set_page_config(page_title="Resume Chatbot", layout="wide")
@@ -10,11 +9,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key =  os.getenv("GROQ_API_KEY")
-if not api_key:
-    st.error("❌ GROQ API key not found.")
-    st.stop()
-
+api_key = ""  # Replace with your actual Groq API key
 client = Groq(api_key=api_key)
 
 # ---- LOAD PDF ----
