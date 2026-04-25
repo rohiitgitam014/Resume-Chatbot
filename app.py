@@ -24,7 +24,7 @@ def load_resume() -> str:
             text += extracted + "\n"
     return text.strip()
 
-resume = load_resume()  # ✅ variable is called `resume`, not `resume_text`
+resume = load_resume()
 
 # ---- SYSTEM PROMPT ----
 def build_system_prompt(resume: str) -> str:
@@ -68,7 +68,7 @@ if user_input:
                     max_tokens=800,
                     temperature=0.1,
                     messages=[
-                        {"role": "system", "content": build_system_prompt(resume)},  # ✅ `resume`
+                        {"role": "system", "content": build_system_prompt(resume)},
                         {"role": "user", "content": user_input}
                     ]
                 )
