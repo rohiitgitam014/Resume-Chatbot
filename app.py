@@ -10,7 +10,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+api_key =  os.getenv("GROQ_API_KEY")
 if not api_key:
     st.error("❌ GROQ API key not found.")
     st.stop()
