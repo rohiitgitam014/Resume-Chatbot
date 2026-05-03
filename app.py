@@ -8,7 +8,7 @@ st.title("🤖 Welcome To Data Scientist Rohit Kumar Chatbot")
 st.image("rohit.jpg", width=300)
 
 # ---- API KEY ----
-api_key = "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"
+api_key = "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"
 client = Groq(api_key=api_key)
 
 # ---- LOAD RESUME FROM LOCAL PDF ----
